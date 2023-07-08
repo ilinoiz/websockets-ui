@@ -5,6 +5,7 @@
     "main": "index.ts",
     "scripts": {
         "start:back": "tsc && node ./dist/wsserver/index.js",
+        "start:back:dev": "nodemon ./src/wsserver/index.ts",
         "start:front": "tsc && node ./dist/index.js",
         "build": "tsc"
     },
@@ -13,6 +14,7 @@
     "license": "ISC",
     "devDependencies": {
         "@types/node": "^20.4.0",
+        "@types/ws": "^8.5.5",
         "nodemon": "^2.0.16",
         "ts-node": "^10.9.1",
         "typescript": "^5.1.6"

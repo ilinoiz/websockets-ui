@@ -1,7 +1,7 @@
 import { DTOBase } from "../DTOBase";
 
 export interface CreateRoomRequestDTO extends DTOBase {
-  data: CreateRoomRequestData;
+  data: string;
 }
 
 export interface CreateRoomRequestData {}
