@@ -28,6 +28,17 @@ export interface ShipCoordinates {
   coordinates: ShipCellCoordinate[];
 }
 
+export enum AttackStatus {
+  miss = "miss",
+  killed = "killed",
+  shot = "shot",
+}
+export interface AttackResult {
+  status: AttackStatus;
+  deadShipCells?: Omit<ShipCellCoordinate, "isDamaged">[];
+  missedCells?: Omit<ShipCellCoordinate, "isDamaged">[];
+}
+
 class RoomsRepository {
   roomsDb: RoomModel[] = [];
 
@@ -61,8 +72,8 @@ class RoomsRepository {
     user.sourceShips = addShipsRequestData.ships;
     user.ships = this.convertShipsFromSource(addShipsRequestData.ships);
 
-    console.log(JSON.stringify(user.sourceShips));
-    console.log(JSON.stringify(user.ships));
+    // console.log(JSON.stringify(user.sourceShips));
+    // console.log(JSON.stringify(user.ships));
   };
 
   isReadyToStart = (roomId: number) => {
@@ -74,13 +85,51 @@ class RoomsRepository {
     return isTwoUsers && isShipsReady;
   };
 
-  getAttackResult = (gameAttackRequestData: GameAttackRequestData) => {
+  getWinner = (roomId: number) => {
+    const room = this.roomsDb.find((room) => room.index === roomId);
+    const looser = room.roomUsers.find((user) => {
+      return user.ships.every((ship) =>
+        ship.coordinates.every((coordinate) => coordinate.isDamaged)
+      );
+    });
+    return looser
+      ? room.roomUsers.find((user) => user.index !== looser.index)
+      : null;
+  };
+
+  getAttackResult = (
+    gameAttackRequestData: GameAttackRequestData
+  ): AttackResult => {
     const room = this.roomsDb.find(
       (room) => room.index === gameAttackRequestData.gameId
     );
     const enemyUser = room.roomUsers.find(
       (user) => user.index !== gameAttackRequestData.indexPlayer
     );
+    for (const ship of enemyUser.ships) {
+      const targetShipCellCoordinateIndex = ship.coordinates.findIndex(
+        (coordinate) =>
+          coordinate.x === gameAttackRequestData.x &&
+          coordinate.y === gameAttackRequestData.y
+      );
+      if (targetShipCellCoordinateIndex > -1) {
+        ship.coordinates[targetShipCellCoordinateIndex].isDamaged = true;
+        if (ship.coordinates.every((coordinate) => coordinate.isDamaged)) {
+          return {
+            status: AttackStatus.killed,
+            deadShipCells: ship.coordinates,
+            missedCells: [],
+            //TODO
+          };
+        } else {
+          return { status: AttackStatus.shot };
+        }
+      }
+    }
+    return { status: AttackStatus.miss };
+    // enemyUser.ships.forEach((ship) => {
+
+    // });
   };
 
   private convertShipsFromSource = (
@@ -107,6 +156,15 @@ class RoomsRepository {
       result.push({ coordinates: shipCoordinates });
     });
     return result;
+  };
+
+  getRoomClients = (gameId: number) => {
+    const room = this.roomsDb.find((room) => room.index === gameId);
+    return room.roomUsers;
+  };
+
+  completeGame = (gameId: number) => {
+    this.roomsDb = this.roomsDb.filter((room) => room.index !== gameId);
   };
 }
 
