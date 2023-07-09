@@ -1,18 +1,18 @@
-import { Command, CommandType } from "./DTOBase";
+
 import { AddShipsRequestData } from "./requests/AddShipsRequestData";
 import { AddUserToRoomRequestData } from "./requests/AddUserToRoomRequestData";
-import { CreateRoomRequestData } from "./requests/CreateRoomRequestDTO";
+import { CommandDTO, CommandType } from "./CommandDTO";
 import { GameAttackRequestData } from "./requests/GameAttackRequestData";
 import { LoginRequestData } from "./requests/LoginRequestDTO";
 
 
 export function parseCommand(message: string) {
-  const command: Command = JSON.parse(message);
+  const command: CommandDTO = JSON.parse(message);
   if (!command.data) {
     return command;
   }
 
-  let data: LoginRequestData | CreateRoomRequestData;
+  let data;
   switch (command.type) {
     case CommandType.login:
       data = parseCommandData<LoginRequestData>(command.data);

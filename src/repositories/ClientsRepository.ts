@@ -1,14 +1,14 @@
-import { ClientModel } from "./RoomsRepository";
-import { WebSocketClient } from "./wsserver";
+import { ClientStoredModel } from "../dbModels/ClientStoredModel";
+import { WebSocketClient } from "../wsserver";
 
 class ClientsRepository {
-  clientsDb: ClientModel[] = [];
+  clientsDb: ClientStoredModel[] = [];
 
   createUser = (userName: string, client: WebSocketClient) => {
     this.clientsDb.push({ userName, client, index: this.clientsDb.length });
   };
   getClient = (sessionId: string) => {
-    return this.clientsDb.find((client) => client.client.id === sessionId);
+    return this.clientsDb.find((client) => client.client.sessionId === sessionId);
   };
 }
 

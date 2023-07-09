@@ -1,49 +1,15 @@
-import {
-  AddShipsRequestData,
-  ShipData as SourceShipData,
-} from "./commands/requests/AddShipsRequestData";
-import { GameAttackRequestData } from "./commands/requests/GameAttackRequestData";
-import { WebSocketClient } from "./wsserver";
-
-export interface RoomModel {
-  roomUsers: ClientModel[];
-  index: number;
-}
-
-export interface ClientModel {
-  userName: string;
-  client: WebSocketClient;
-  index: number;
-  sourceShips?: SourceShipData[];
-  ships?: ShipCoordinates[];
-}
-
-export interface ShipCellCoordinate {
-  x: number;
-  y: number;
-  isDamaged: boolean;
-}
-
-export interface ShipCoordinates {
-  coordinates: ShipCellCoordinate[];
-}
-
-export enum AttackStatus {
-  miss = "miss",
-  killed = "killed",
-  shot = "shot",
-}
-export interface AttackResult {
-  status: AttackStatus;
-  deadShipCells?: Omit<ShipCellCoordinate, "isDamaged">[];
-  missedCells?: Omit<ShipCellCoordinate, "isDamaged">[];
-}
+import { AddShipsRequestData, ShipData } from "../commands/requests/AddShipsRequestData";
+import { GameAttackRequestData } from "../commands/requests/GameAttackRequestData";
+import { ClientStoredModel } from "../dbModels/ClientStoredModel";
+import { RoomStoredModel } from "../dbModels/RoomStoredModel";
+import { ShipCellCoordinate, ShipCoordinatesStoredModel } from "../dbModels/ShipCoordinatesStoredModel";
+import { AttackResult, AttackStatus } from "../models/attackResultModel";
 
 class RoomsRepository {
-  roomsDb: RoomModel[] = [];
+  roomsDb: RoomStoredModel[] = [];
 
-  createRoom = (client: ClientModel) => {
-    const newRoom: RoomModel = {
+  createRoom = (client: ClientStoredModel) => {
+    const newRoom: RoomStoredModel = {
       roomUsers: [client],
       index: this.roomsDb.length,
     };
@@ -51,7 +17,7 @@ class RoomsRepository {
     return newRoom;
   };
 
-  addUserToRoom = (client: ClientModel, indexRoom: number) => {
+  addUserToRoom = (client: ClientStoredModel, indexRoom: number) => {
     const room = this.roomsDb.find((room) => room.index === indexRoom);
     if (room.roomUsers.length < 2) {
       room.roomUsers.push(client);
@@ -71,9 +37,6 @@ class RoomsRepository {
     );
     user.sourceShips = addShipsRequestData.ships;
     user.ships = this.convertShipsFromSource(addShipsRequestData.ships);
-
-    // console.log(JSON.stringify(user.sourceShips));
-    // console.log(JSON.stringify(user.ships));
   };
 
   isReadyToStart = (roomId: number) => {
@@ -133,9 +96,9 @@ class RoomsRepository {
   };
 
   private convertShipsFromSource = (
-    ships: SourceShipData[]
-  ): ShipCoordinates[] => {
-    const result: ShipCoordinates[] = [];
+    ships: ShipData[]
+  ): ShipCoordinatesStoredModel[] => {
+    const result: ShipCoordinatesStoredModel[] = [];
 
     ships.forEach((ship) => {
       const shipCoordinates: ShipCellCoordinate[] = [];

@@ -1,13 +1,7 @@
-import { ClientModel } from "./RoomsRepository";
-import { WebSocketClient } from "./wsserver";
-
-interface WinnersModel {
-  name: string;
-  wins: number;
-}
+import { WinnersStoredModel } from "../dbModels/WinnerStoredModel";
 
 class WinnersRepository {
-  winnersDb: WinnersModel[] = [];
+  winnersDb: WinnersStoredModel[] = [];
 
   addWinner = (userName: string) => {
     const winnerIndex = this.winnersDb.findIndex(
