@@ -10,6 +10,7 @@ export const addShipsHandler = (data: AddShipsRequestData) => {
   if (isReadyToStart) {
     const roomClients = roomsRepository.getRoomClients(data.gameId);
     commandSender.sendStartGame(roomClients);
+    roomsRepository.setCurrentTurnClientId(data.gameId, data.indexPlayer);
     commandSender.sendTurn(data.indexPlayer, roomClients);
   }
 };

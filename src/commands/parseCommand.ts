@@ -1,10 +1,9 @@
-
 import { AddShipsRequestData } from "./requests/AddShipsRequestData";
 import { AddUserToRoomRequestData } from "./requests/AddUserToRoomRequestData";
 import { CommandDTO, CommandType } from "./CommandDTO";
 import { GameAttackRequestData } from "./requests/GameAttackRequestData";
 import { LoginRequestData } from "./requests/LoginRequestDTO";
-
+import { RandomAttackRequestData } from "./requests/RandomAttackRequestData";
 
 export function parseCommand(message: string) {
   const command: CommandDTO = JSON.parse(message);
@@ -28,6 +27,9 @@ export function parseCommand(message: string) {
       break;
     case CommandType.attack:
       data = parseCommandData<GameAttackRequestData>(command.data);
+      break;
+    case CommandType.randomAttack:
+      data = parseCommandData<RandomAttackRequestData>(command.data);
       break;
     default:
       break;

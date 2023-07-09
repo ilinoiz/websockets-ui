@@ -1,12 +1,33 @@
-import { AddShipsRequestData, ShipData } from "../commands/requests/AddShipsRequestData";
+import {
+  AddShipsRequestData,
+  ShipData,
+} from "../commands/requests/AddShipsRequestData";
 import { GameAttackRequestData } from "../commands/requests/GameAttackRequestData";
 import { ClientStoredModel } from "../dbModels/ClientStoredModel";
 import { RoomStoredModel } from "../dbModels/RoomStoredModel";
-import { ShipCellCoordinate, ShipCoordinatesStoredModel } from "../dbModels/ShipCoordinatesStoredModel";
+import {
+  ShipCellCoordinate,
+  ShipCoordinatesStoredModel,
+} from "../dbModels/ShipCoordinatesStoredModel";
 import { AttackResult, AttackStatus } from "../models/attackResultModel";
 
 class RoomsRepository {
   roomsDb: RoomStoredModel[] = [];
+
+  getClientsRoom = (clientId: number) => {
+    return this.roomsDb.find((room) =>
+      room.roomUsers.find((user) => user.index === clientId)
+    );
+  };
+  getCurrentTurnClientId = (indexRoom: number) => {
+    const room = this.roomsDb.find((room) => room.index === indexRoom);
+    return room.currentTurnClientId;
+  };
+
+  setCurrentTurnClientId(indexRoom: number, currentTurnClientId: number) {
+    const room = this.roomsDb.find((room) => room.index === indexRoom);
+    room.currentTurnClientId = currentTurnClientId;
+  }
 
   createRoom = (client: ClientStoredModel) => {
     const newRoom: RoomStoredModel = {
@@ -78,12 +99,34 @@ class RoomsRepository {
       if (targetShipCellCoordinateIndex > -1) {
         ship.coordinates[targetShipCellCoordinateIndex].isDamaged = true;
         if (ship.coordinates.every((coordinate) => coordinate.isDamaged)) {
-          return {
+          const missedCells = [];
+          ship.coordinates.forEach((cell) => {
+            for (let i = cell.x - 1; i <= cell.x + 1; i++) {
+              for (let j = cell.y - 1; j <= cell.y + 1; j++) {
+                missedCells.push({ x: i, y: j });
+              }
+            }
+          });
+          const clearedCells = [];
+          missedCells.map((cell) => {
+            if (
+              !clearedCells.find(
+                (item) => item.x === cell.x && item.y === cell.y
+              ) &&
+              !ship.coordinates.find(
+                (item) => item.x === cell.x && item.y === cell.y
+              )
+            ) {
+              clearedCells.push(cell);
+            }
+          });
+
+          const attackResult = {
             status: AttackStatus.killed,
             deadShipCells: ship.coordinates,
-            missedCells: [],
-            //TODO
+            missedCells: clearedCells,
           };
+          return attackResult;
         } else {
           return { status: AttackStatus.shot };
         }

@@ -4,11 +4,15 @@ import { WebSocketClient } from "../wsserver";
 class ClientsRepository {
   clientsDb: ClientStoredModel[] = [];
 
-  createUser = (userName: string, client: WebSocketClient) => {
-    this.clientsDb.push({ userName, client, index: this.clientsDb.length });
+  createClient = (userName: string, client: WebSocketClient) => {
+    const newClient = { userName, client, index: this.clientsDb.length };
+    this.clientsDb.push(newClient);
+    return newClient;
   };
   getClient = (sessionId: string) => {
-    return this.clientsDb.find((client) => client.client.sessionId === sessionId);
+    return this.clientsDb.find(
+      (client) => client.client.sessionId === sessionId
+    );
   };
 }
 

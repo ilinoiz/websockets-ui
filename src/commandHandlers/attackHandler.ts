@@ -7,8 +7,12 @@ import winnersRepository from "../repositories/WinnersRepository";
 export const attackHandler = (data: GameAttackRequestData) => {
   const attackResult = roomsRepository.getAttackResult(data);
   const roomClients = roomsRepository.getRoomClients(data.gameId);
-
-  commandSender.sendAttack(data, attackResult, roomClients);
+  const currentTurnClientId = roomsRepository.getCurrentTurnClientId(data.gameId);
+  if(data.indexPlayer !== currentTurnClientId){
+    console.log(`Error wrong client made his turn turnMade client = ${data.indexPlayer} but should client =${currentTurnClientId}`)
+    return;
+  }
+  commandSender.sendAttack(data, attackResult.status, roomClients);
 
   if (attackResult.status === AttackStatus.killed) {
     attackResult.deadShipCells.forEach((deadShip) => {
@@ -18,7 +22,20 @@ export const attackHandler = (data: GameAttackRequestData) => {
         indexPlayer: data.indexPlayer,
         gameId: data.gameId,
       };
-      commandSender.sendAttack(sendAttackData, attackResult, roomClients);
+      commandSender.sendAttack(
+        sendAttackData,
+        AttackStatus.killed,
+        roomClients
+      );
+    });
+    attackResult.missedCells.forEach((missedCell) => {
+      const sendAttackData = {
+        x: missedCell.x,
+        y: missedCell.y,
+        indexPlayer: data.indexPlayer,
+        gameId: data.gameId,
+      };
+      commandSender.sendAttack(sendAttackData, AttackStatus.miss, roomClients);
     });
 
     const winner = roomsRepository.getWinner(data.gameId);
@@ -37,4 +54,5 @@ export const attackHandler = (data: GameAttackRequestData) => {
       ? enemyClient.index
       : data.indexPlayer;
   commandSender.sendTurn(currentClientId, roomClients);
+  roomsRepository.setCurrentTurnClientId(data.gameId, currentClientId);
 };

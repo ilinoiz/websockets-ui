@@ -2,13 +2,13 @@ import * as WebSocket from "ws";
 import winnersRepository from "./repositories/WinnersRepository";
 import roomsRepository from "./repositories/RoomsRepository";
 import { ClientStoredModel } from "./dbModels/ClientStoredModel";
-import { AttackResult } from "./models/attackResultModel";
+import { AttackStatus } from "./models/attackResultModel";
 import { GameAttackRequestData } from "./commands/requests/GameAttackRequestData";
 import { RoomStoredModel } from "./dbModels/RoomStoredModel";
 import { WebSocketClient } from "./wsserver";
-import { LoginRequestData } from "./commands/requests/LoginRequestDTO";
 import { CommandDTO, CommandType } from "./commands/CommandDTO";
 import { AddUserToRoomRequestData } from "./commands/requests/AddUserToRoomRequestData";
+import { LoginResponseData } from "./commands/responses/LoginResponseDTO";
 
 class CommandSender {
   sendStartGame = (roomClients: ClientStoredModel[]) => {
@@ -22,17 +22,10 @@ class CommandSender {
   };
 
   sendLogin = (
-    data: LoginRequestData,
+    data: LoginResponseData,
     currentSocketClient: WebSocketClient
   ) => {
-    const loginData = {
-      name: data.name,
-      index: 0,
-      error: false,
-      errorText: "",
-    };
-
-    this.sendCommand(currentSocketClient, loginData, CommandType.login);
+    this.sendCommand(currentSocketClient, data, CommandType.login);
   };
 
   sendCreateRoom = (
@@ -93,14 +86,14 @@ class CommandSender {
 
   sendAttack = (
     data: GameAttackRequestData,
-    attackResult: AttackResult,
+    attackResultStatus: AttackStatus,
     roomClients: ClientStoredModel[]
   ) => {
     roomClients.forEach(({ client }) => {
       const attackResponseData = {
         position: { x: data.x, y: data.y },
         currentPlayer: data.indexPlayer,
-        status: attackResult.status,
+        status: attackResultStatus,
       };
       this.sendCommand(client, attackResponseData, CommandType.attack);
     });
