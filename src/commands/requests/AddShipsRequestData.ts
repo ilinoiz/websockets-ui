@@ -1,3 +1,5 @@
+import { CellCoordinates } from "../../dbModels/ShipCoordinatesStoredModel";
+
 export interface AddShipsRequestData {
   gameId: number;
   indexPlayer: number;
@@ -5,10 +7,7 @@ export interface AddShipsRequestData {
 }
 
 export interface ShipData {
-  position: {
-    x: number;
-    y: number;
-  };
+  position: CellCoordinates;
   direction: boolean;
   type: string;
   length: number;

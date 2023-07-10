@@ -41,11 +41,11 @@ class CommandSender {
 
   sendCreateGame = (
     roomClients: ClientStoredModel[],
-    data: AddUserToRoomRequestData
+    indexRoom:number
   ) => {
     roomClients.forEach((roomClient) => {
       const createGameData = {
-        idGame: data.indexRoom,
+        idGame: indexRoom,
         idPlayer: roomClient.index,
       };
       this.sendCommand(

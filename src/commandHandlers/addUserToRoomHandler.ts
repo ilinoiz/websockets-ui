@@ -12,5 +12,5 @@ export const addUserToRoomHandler = (
   const client = clientsRepository.getClient(currentSocketClient.sessionId);
   roomsRepository.addUserToRoom(client, data.indexRoom);
   const roomClients = roomsRepository.getRoomClients(data.indexRoom);
-  commandSender.sendCreateGame(roomClients, data);
+  commandSender.sendCreateGame(roomClients, data.indexRoom);
 };

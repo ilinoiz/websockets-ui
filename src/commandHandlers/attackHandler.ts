@@ -7,12 +7,21 @@ import winnersRepository from "../repositories/WinnersRepository";
 export const attackHandler = (data: GameAttackRequestData) => {
   const attackResult = roomsRepository.getAttackResult(data);
   const roomClients = roomsRepository.getRoomClients(data.gameId);
-  const currentTurnClientId = roomsRepository.getCurrentTurnClientId(data.gameId);
-  if(data.indexPlayer !== currentTurnClientId){
-    console.log(`Error wrong client made his turn turnMade client = ${data.indexPlayer} but should client =${currentTurnClientId}`)
+
+  const currentTurnClientId = roomsRepository.getCurrentTurnClientId(
+    data.gameId
+  );
+  if (data.indexPlayer !== currentTurnClientId) {
+    console.log(
+      `Error wrong client made his turn turnMade client = ${data.indexPlayer} but should client =${currentTurnClientId}`
+    );
     return;
   }
   commandSender.sendAttack(data, attackResult.status, roomClients);
+  roomsRepository.addClientTurnToHistory(data.indexPlayer, data.gameId, {
+    x: data.x,
+    y: data.y,
+  });
 
   if (attackResult.status === AttackStatus.killed) {
     attackResult.deadShipCells.forEach((deadShip) => {
@@ -35,6 +44,10 @@ export const attackHandler = (data: GameAttackRequestData) => {
         indexPlayer: data.indexPlayer,
         gameId: data.gameId,
       };
+      roomsRepository.addClientTurnToHistory(data.indexPlayer, data.gameId, {
+        x: missedCell.x,
+        y: missedCell.y,
+      });
       commandSender.sendAttack(sendAttackData, AttackStatus.miss, roomClients);
     });
 

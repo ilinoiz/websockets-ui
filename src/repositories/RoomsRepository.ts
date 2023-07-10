@@ -6,6 +6,7 @@ import { GameAttackRequestData } from "../commands/requests/GameAttackRequestDat
 import { ClientStoredModel } from "../dbModels/ClientStoredModel";
 import { RoomStoredModel } from "../dbModels/RoomStoredModel";
 import {
+  CellCoordinates,
   ShipCellCoordinate,
   ShipCoordinatesStoredModel,
 } from "../dbModels/ShipCoordinatesStoredModel";
@@ -13,6 +14,23 @@ import { AttackResult, AttackStatus } from "../models/attackResultModel";
 
 class RoomsRepository {
   roomsDb: RoomStoredModel[] = [];
+
+  addClientTurnToHistory = (
+    clientId: number,
+    indexRoom: number,
+    cellCoordinates: CellCoordinates
+  ) => {
+    const room = this.roomsDb.find((room) => room.index === indexRoom);
+    const user = room.roomUsers.find((user) => user.index === clientId);
+    user.history ??= [];
+    user.history.push(cellCoordinates);
+  };
+
+  getClientTurnsHistory = (clientId: number, indexRoom: number) => {
+    const room = this.roomsDb.find((room) => room.index === indexRoom);
+    const user = room.roomUsers.find((user) => user.index === clientId);
+    return user.history || [];
+  };
 
   getClientsRoom = (clientId: number) => {
     return this.roomsDb.find((room) =>
