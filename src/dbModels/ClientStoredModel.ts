@@ -12,4 +12,5 @@ export interface ClientStoredModel {
   sourceShips?: ShipData[];
   ships?: ShipCoordinatesStoredModel[];
   history?: CellCoordinates[];
+  isBot?: boolean;
 }

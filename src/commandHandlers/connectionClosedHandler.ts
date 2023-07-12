@@ -26,4 +26,5 @@ export const connectionClosedHandler = (
   );
 
   commandSender.sendWinner(winnerClient, roomClients);
+  roomsRepository.completeGame(clientRoom.index);
 };

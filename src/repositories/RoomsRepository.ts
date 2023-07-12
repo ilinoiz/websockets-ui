@@ -47,6 +47,17 @@ class RoomsRepository {
     room.currentTurnClientId = currentTurnClientId;
   }
 
+  createSinglePlayerRoom = (client: ClientStoredModel) => {
+    const room = this.createRoom(client);
+    room.isSinglePlayerRoom = true;
+    return room;
+  };
+
+  isSinglePlayerRoom = (indexRoom: number): boolean => {
+    const room = this.roomsDb.find((room) => room.index === indexRoom);
+    return room.isSinglePlayerRoom;
+  };
+
   createRoom = (client: ClientStoredModel) => {
     const newRoom: RoomStoredModel = {
       roomUsers: [client],
@@ -105,6 +116,9 @@ class RoomsRepository {
     const room = this.roomsDb.find(
       (room) => room.index === gameAttackRequestData.gameId
     );
+    if (!room) {
+      return;
+    }
     const enemyUser = room.roomUsers.find(
       (user) => user.index !== gameAttackRequestData.indexPlayer
     );
@@ -117,28 +131,7 @@ class RoomsRepository {
       if (targetShipCellCoordinateIndex > -1) {
         ship.coordinates[targetShipCellCoordinateIndex].isDamaged = true;
         if (ship.coordinates.every((coordinate) => coordinate.isDamaged)) {
-          const missedCells = [];
-          ship.coordinates.forEach((cell) => {
-            for (let i = cell.x - 1; i <= cell.x + 1; i++) {
-              for (let j = cell.y - 1; j <= cell.y + 1; j++) {
-                missedCells.push({ x: i, y: j });
-              }
-            }
-          });
-          const clearedCells = [];
-          missedCells.map((cell) => {
-            if (
-              !clearedCells.find(
-                (item) => item.x === cell.x && item.y === cell.y
-              ) &&
-              !ship.coordinates.find(
-                (item) => item.x === cell.x && item.y === cell.y
-              )
-            ) {
-              clearedCells.push(cell);
-            }
-          });
-
+          const clearedCells = this.getShipBorderCells(ship);
           const attackResult = {
             status: AttackStatus.killed,
             deadShipCells: ship.coordinates,
@@ -181,6 +174,28 @@ class RoomsRepository {
     });
     return result;
   };
+  private getShipBorderCells = (
+    ship: ShipCoordinatesStoredModel
+  ): CellCoordinates[] => {
+    const missedCells = [];
+    ship.coordinates.forEach((cell) => {
+      for (let i = cell.x - 1; i <= cell.x + 1; i++) {
+        for (let j = cell.y - 1; j <= cell.y + 1; j++) {
+          missedCells.push({ x: i, y: j });
+        }
+      }
+    });
+    const clearedCells = [];
+    missedCells.map((cell) => {
+      if (
+        !clearedCells.find((item) => item.x === cell.x && item.y === cell.y) &&
+        !ship.coordinates.find((item) => item.x === cell.x && item.y === cell.y)
+      ) {
+        clearedCells.push(cell);
+      }
+    });
+    return clearedCells;
+  };
 
   getRoomClients = (gameId: number) => {
     const room = this.roomsDb.find((room) => room.index === gameId);
@@ -188,6 +203,12 @@ class RoomsRepository {
   };
 
   completeGame = (gameId: number) => {
+    const finishedGame = this.roomsDb.find((room) => room.index === gameId);
+    finishedGame.roomUsers.forEach((client) => {
+      client.history = [];
+      client.ships = [];
+      client.sourceShips = [];
+    });
     this.roomsDb = this.roomsDb.filter((room) => room.index !== gameId);
   };
 }

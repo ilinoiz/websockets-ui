@@ -39,10 +39,7 @@ class CommandSender {
     this.sendCommand(client, createGameData, CommandType.createGame);
   };
 
-  sendCreateGame = (
-    roomClients: ClientStoredModel[],
-    indexRoom:number
-  ) => {
+  sendCreateGame = (roomClients: ClientStoredModel[], indexRoom: number) => {
     roomClients.forEach((roomClient) => {
       const createGameData = {
         idGame: indexRoom,
@@ -133,7 +130,9 @@ class CommandSender {
       id: 0,
     };
 
-    webSocketClient.send(JSON.stringify(command));
+    if (webSocketClient) {
+      webSocketClient.send(JSON.stringify(command));
+    }
   };
 }
 

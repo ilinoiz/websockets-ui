@@ -1,12 +1,12 @@
-import { ShipCellCoordinate } from "../dbModels/ShipCoordinatesStoredModel";
+import { CellCoordinates } from "../dbModels/ShipCoordinatesStoredModel";
 
 export enum AttackStatus {
-    miss = "miss",
-    killed = "killed",
-    shot = "shot",
-  }
-  export interface AttackResult {
-    status: AttackStatus;
-    deadShipCells?: Omit<ShipCellCoordinate, "isDamaged">[];
-    missedCells?: Omit<ShipCellCoordinate, "isDamaged">[];
-  }
+  miss = "miss",
+  killed = "killed",
+  shot = "shot",
+}
+export interface AttackResult {
+  status: AttackStatus;
+  deadShipCells?: CellCoordinates[];
+  missedCells?: CellCoordinates[];
+}

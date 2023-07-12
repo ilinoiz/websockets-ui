@@ -11,6 +11,8 @@ import commandSender from "../CommandSender";
 import { CommandType } from "../commands/CommandDTO";
 import { randomAttackHandler } from "../commandHandlers/randomAttackHandler";
 import { connectionClosedHandler } from "../commandHandlers/connectionClosedHandler";
+import { singlePlayHandler } from "../commandHandlers/singlePlayHandler";
+import { randomShipsGenerator } from "../randomShipsGenerator";
 
 export type WebSocketClient = WebSocket & { sessionId: string };
 
@@ -62,6 +64,9 @@ wss.on(
           break;
         case CommandType.randomAttack:
           randomAttackHandler(request.data);
+          break;
+        case CommandType.single_play:
+          singlePlayHandler(currentSocketClient);
           break;
         default:
           break;

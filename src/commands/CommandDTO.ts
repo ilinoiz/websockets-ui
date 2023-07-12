@@ -11,6 +11,7 @@ export enum CommandType {
   randomAttack = "randomAttack",
   turn = "turn",
   finish = "finish",
+  single_play = "single_play",
 }
 
 export class CommandDTO {
