@@ -7,10 +7,13 @@ import { ClientStoredModel } from "../dbModels/ClientStoredModel";
 import { RoomStoredModel } from "../dbModels/RoomStoredModel";
 import {
   CellCoordinates,
-  ShipCellCoordinate,
   ShipCoordinatesStoredModel,
 } from "../dbModels/ShipCoordinatesStoredModel";
 import { AttackResult, AttackStatus } from "../models/attackResultModel";
+import {
+  convertShipFromSource,
+  getShipBorderCells,
+} from "../randomShipsGenerator";
 
 class RoomsRepository {
   roomsDb: RoomStoredModel[] = [];
@@ -28,6 +31,9 @@ class RoomsRepository {
 
   getClientTurnsHistory = (clientId: number, indexRoom: number) => {
     const room = this.roomsDb.find((room) => room.index === indexRoom);
+    if (!room?.roomUsers) {
+      return [];
+    }
     const user = room.roomUsers.find((user) => user.index === clientId);
     return user.history || [];
   };
@@ -131,7 +137,7 @@ class RoomsRepository {
       if (targetShipCellCoordinateIndex > -1) {
         ship.coordinates[targetShipCellCoordinateIndex].isDamaged = true;
         if (ship.coordinates.every((coordinate) => coordinate.isDamaged)) {
-          const clearedCells = this.getShipBorderCells(ship);
+          const clearedCells = getShipBorderCells(ship);
           const attackResult = {
             status: AttackStatus.killed,
             deadShipCells: ship.coordinates,
@@ -144,9 +150,6 @@ class RoomsRepository {
       }
     }
     return { status: AttackStatus.miss };
-    // enemyUser.ships.forEach((ship) => {
-
-    // });
   };
 
   private convertShipsFromSource = (
@@ -155,46 +158,9 @@ class RoomsRepository {
     const result: ShipCoordinatesStoredModel[] = [];
 
     ships.forEach((ship) => {
-      const shipCoordinates: ShipCellCoordinate[] = [];
-      let xCoordinate = ship.position.x;
-      let yCoordinate = ship.position.y;
-      for (let i = 0; i < ship.length; i++) {
-        const coordinate = { x: null, y: null, isDamaged: false };
-
-        if (ship.direction) {
-          coordinate.x = ship.position.x;
-          coordinate.y = yCoordinate++;
-        } else {
-          coordinate.x = xCoordinate++;
-          coordinate.y = ship.position.y;
-        }
-        shipCoordinates.push(coordinate);
-      }
-      result.push({ coordinates: shipCoordinates });
+      result.push(convertShipFromSource(ship));
     });
     return result;
-  };
-  private getShipBorderCells = (
-    ship: ShipCoordinatesStoredModel
-  ): CellCoordinates[] => {
-    const missedCells = [];
-    ship.coordinates.forEach((cell) => {
-      for (let i = cell.x - 1; i <= cell.x + 1; i++) {
-        for (let j = cell.y - 1; j <= cell.y + 1; j++) {
-          missedCells.push({ x: i, y: j });
-        }
-      }
-    });
-    const clearedCells = [];
-    missedCells.map((cell) => {
-      if (
-        !clearedCells.find((item) => item.x === cell.x && item.y === cell.y) &&
-        !ship.coordinates.find((item) => item.x === cell.x && item.y === cell.y)
-      ) {
-        clearedCells.push(cell);
-      }
-    });
-    return clearedCells;
   };
 
   getRoomClients = (gameId: number) => {

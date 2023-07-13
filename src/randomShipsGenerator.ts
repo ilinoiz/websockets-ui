@@ -4,6 +4,7 @@ import {
   ShipCellCoordinate,
   ShipCoordinatesStoredModel,
 } from "./dbModels/ShipCoordinatesStoredModel";
+
 const shipsConfig = {
   huge: {
     length: 4,
@@ -55,11 +56,11 @@ export const randomShipsGenerator = (): ShipData[] => {
       }
     }
   }
-  console.log(JSON.stringify(result));
+
   return result;
 };
 
-const getShipBorderCells = (
+export const getShipBorderCells = (
   ship: ShipCoordinatesStoredModel
 ): CellCoordinates[] => {
   const missedCells = [];
@@ -82,9 +83,9 @@ const getShipBorderCells = (
   return clearedCells;
 };
 
-const convertShipFromSource = (ship: ShipData): ShipCoordinatesStoredModel => {
-  const result: ShipCoordinatesStoredModel[] = [];
-
+export const convertShipFromSource = (
+  ship: ShipData
+): ShipCoordinatesStoredModel => {
   const shipCoordinates: ShipCellCoordinate[] = [];
   let xCoordinate = ship.position.x;
   let yCoordinate = ship.position.y;
@@ -104,13 +105,14 @@ const convertShipFromSource = (ship: ShipData): ShipCoordinatesStoredModel => {
   return { coordinates: shipCoordinates };
 };
 
-const generateRandomValue = (from = 0, to = 9) => {
+export const generateRandomValue = (from = 0, to = 9) => {
   return Math.floor(Math.random() * (to - from + 1) + from);
 };
-function IsIntersected(
+
+const IsIntersected = (
   ship: ShipCoordinatesStoredModel,
   allCoordinates: CellCoordinates[]
-) {
+) => {
   if (!allCoordinates.length) {
     return false;
   }
@@ -126,9 +128,9 @@ function IsIntersected(
   }
 
   return false;
-}
+};
 
-function IsOutOfBorder(ship: ShipData) {
+const IsOutOfBorder = (ship: ShipData) => {
   if (ship.type === "small") {
     return false;
   }
@@ -137,4 +139,4 @@ function IsOutOfBorder(ship: ShipData) {
   } else {
     return ship.position.x + ship.length > 9;
   }
-}
+};

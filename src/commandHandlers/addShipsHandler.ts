@@ -6,7 +6,11 @@ import roomsRepository from "../repositories/RoomsRepository";
 export const addShipsHandler = (data: AddShipsRequestData) => {
   const room = roomsRepository.getClientsRoom(data.gameId);
 
-  if (!room.isSinglePlayerRoom) {
+  if (!room) {
+    return;
+  }
+
+  if (!room?.isSinglePlayerRoom) {
     roomsRepository.addShips(data);
 
     const isReadyToStart = roomsRepository.isReadyToStart(data.gameId);

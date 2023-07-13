@@ -20,7 +20,7 @@ export const attackHandler = (data: GameAttackRequestData) => {
   );
   if (data.indexPlayer !== currentTurnClientId) {
     console.log(
-      `Error wrong client made his turn turnMade client = ${data.indexPlayer} but should client =${currentTurnClientId}`
+      `wrong client made his turn turnMade client = ${data.indexPlayer} but should client =${currentTurnClientId}`
     );
     return;
   }

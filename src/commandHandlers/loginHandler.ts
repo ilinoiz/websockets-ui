@@ -19,6 +19,9 @@ export const loginHandler = (
   if (!authResult.isAuthenticated) {
     loginData.error = true;
     loginData.errorText = authResult.errorMessage;
+  } else if (clientsRepository.isUsernameTaken(data.name)) {
+    loginData.error = true;
+    loginData.errorText = "This username is already taken. Try another one.";
   } else {
     const client = clientsRepository.createClient(
       data.name,

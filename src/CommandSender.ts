@@ -7,7 +7,6 @@ import { GameAttackRequestData } from "./commands/requests/GameAttackRequestData
 import { RoomStoredModel } from "./dbModels/RoomStoredModel";
 import { WebSocketClient } from "./wsserver";
 import { CommandDTO, CommandType } from "./commands/CommandDTO";
-import { AddUserToRoomRequestData } from "./commands/requests/AddUserToRoomRequestData";
 import { LoginResponseData } from "./commands/responses/LoginResponseDTO";
 
 class CommandSender {

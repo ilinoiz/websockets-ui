@@ -4,6 +4,12 @@ import { WebSocketClient } from "../wsserver";
 class ClientsRepository {
   clientsDb: ClientStoredModel[] = [];
 
+  isUsernameTaken = (username: string): boolean => {
+    return this.clientsDb.some(
+      (client) => client.userName.toLowerCase() === username.toLowerCase()
+    );
+  };
+
   createClient = (
     userName: string,
     client: WebSocketClient,
@@ -22,9 +28,16 @@ class ClientsRepository {
     this.clientsDb.push(newClient);
     return newClient;
   };
+
   getClient = (sessionId: string) => {
     return this.clientsDb.find(
       (client) => client.client?.sessionId === sessionId
+    );
+  };
+
+  deleteClient = (sessionId: string) => {
+    this.clientsDb = this.clientsDb.filter(
+      ({ client }) => client.sessionId !== sessionId
     );
   };
 }

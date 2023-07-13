@@ -1,5 +1,6 @@
 import { GameAttackRequestData } from "../commands/requests/GameAttackRequestData";
 import { RandomAttackRequestData } from "../commands/requests/RandomAttackRequestData";
+import { generateRandomValue } from "../randomShipsGenerator";
 import roomsRepository from "../repositories/RoomsRepository";
 import { attackHandler } from "./attackHandler";
 
@@ -8,6 +9,10 @@ export const randomAttackHandler = (data: RandomAttackRequestData) => {
     data.indexPlayer,
     data.gameId
   );
+
+  if (!history) {
+    return;
+  }
 
   let isUsedCoordinates = true;
   const cellCoordinates = {
@@ -30,8 +35,4 @@ export const randomAttackHandler = (data: RandomAttackRequestData) => {
     ...cellCoordinates,
   };
   attackHandler(gameAttackRequestData);
-};
-
-const generateRandomValue = (from = 0, to = 9) => {
-  return Math.floor(Math.random() * (to - from + 1) + from);
 };

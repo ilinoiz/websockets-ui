@@ -12,7 +12,6 @@ import { CommandType } from "../commands/CommandDTO";
 import { randomAttackHandler } from "../commandHandlers/randomAttackHandler";
 import { connectionClosedHandler } from "../commandHandlers/connectionClosedHandler";
 import { singlePlayHandler } from "../commandHandlers/singlePlayHandler";
-import { randomShipsGenerator } from "../randomShipsGenerator";
 
 export type WebSocketClient = WebSocket & { sessionId: string };
 
@@ -25,26 +24,22 @@ wss.on(
     console.log(
       `New client connected client sessionId: ${currentSocketClient.sessionId}`
     );
-    // currentSocketClient.on("open", () => {
-    //   console.log(
-    //     `New client connected client sessionId=${currentSocketClient.sessionId}`
-    //   );
-    // });
 
     currentSocketClient.on("close", (code: number) => {
       console.log(
         `Client disconnected client with code: ${code} and sessionId: ${currentSocketClient.sessionId}`
       );
       connectionClosedHandler(currentSocketClient);
+      commandSender.sendUpdateWinners(wss.clients as Set<WebSocket>);
     });
 
     currentSocketClient.on("message", (data: string) => {
       const request = parseCommand(data.toString());
-      // console.log(
-      //   `received data: ${JSON.stringify(request)}, sessionId=${
-      //     currentSocketClient.sessionId
-      //   }`
-      // );
+      console.log(
+        `received data: ${JSON.stringify(request)}, sessionId=${
+          currentSocketClient.sessionId
+        }`
+      );
 
       switch (request.type) {
         case CommandType.login:
