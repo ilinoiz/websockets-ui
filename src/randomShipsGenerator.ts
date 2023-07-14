@@ -41,7 +41,7 @@ export const randomShipsGenerator = (): ShipData[] => {
           length: shipsConfig[shipType].length,
           direction: !!generateRandomValue(0, 1),
         };
-        if (IsOutOfBorder(generatedShip)) {
+        if (isOutOfBorder(generatedShip)) {
           continue;
         }
         const ship = convertShipFromSource(generatedShip);
@@ -130,7 +130,7 @@ const IsIntersected = (
   return false;
 };
 
-const IsOutOfBorder = (ship: ShipData) => {
+const isOutOfBorder = (ship: ShipData) => {
   if (ship.type === "small") {
     return false;
   }

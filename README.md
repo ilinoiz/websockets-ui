@@ -5,27 +5,29 @@
 ## Installation
 1. Clone/download repo
 2. `npm install`
+3. use 18 version of NodeJS
 
 ## Usage
-**Development**
+**Front-end**
 
-`npm run start:dev`
+`npm run start:front` for FE part
 
 * App served @ `http://localhost:8181` with nodemon
 
-**Production**
+**Back-end**
 
-`npm run start`
+`npm run start:back:dev` for BE part if you want to see logs
+or
+`npm run start:back` for BE prod build
 
-* App served @ `http://localhost:8181` without nodemon
+## Users for usage:
 
----
+| login       | password    |
+| ----------- | ----------- |
+| admin       | admin       |
+| test1       | test1       |
+| test2       | test2       |
+| test3       | test3       |
+| test4       | test4       |
 
-**All commands**
-
-Command | Description
---- | ---
-`npm run start:dev` | App served @ `http://localhost:8181` with nodemon
-`npm run start` | App served @ `http://localhost:8181` without nodemon
-
-**Note**: replace `npm` with `yarn` in `package.json` if you use yarn.
+Enjoy game! ^_^

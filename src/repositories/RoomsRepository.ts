@@ -43,6 +43,7 @@ class RoomsRepository {
       room.roomUsers.find((user) => user.index === clientId)
     );
   };
+  
   getCurrentTurnClientId = (indexRoom: number) => {
     const room = this.roomsDb.find((room) => room.index === indexRoom);
     return room.currentTurnClientId;
