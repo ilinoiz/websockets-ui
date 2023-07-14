@@ -37,7 +37,7 @@ class ClientsRepository {
 
   deleteClient = (sessionId: string) => {
     this.clientsDb = this.clientsDb.filter(
-      ({ client }) => client.sessionId !== sessionId
+      ({ client }) => client?.sessionId !== sessionId
     );
   };
 }

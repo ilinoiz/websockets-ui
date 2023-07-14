@@ -7,21 +7,23 @@ export interface AuthResultModel {
 
 class AuthenticationService {
   auth = (userName: string, password: string): AuthResultModel => {
-    const user = usersDb.find(
-      (user) =>
-        user.name.toLowerCase() === userName.toLowerCase() &&
-        user.password === password
+    const userIndex = usersDb.findIndex(
+      (user) => user.name.toLowerCase() === userName.toLowerCase()
     );
-    if (!user) {
-      return {
-        isAuthenticated: false,
-        errorMessage: "Invalid login or password",
-      };
+    if (userIndex >= 0) {
+      const isValidPassword = usersDb[userIndex].password === password;
+      if (!isValidPassword) {
+        return {
+          isAuthenticated: false,
+          errorMessage: "Invalid login or password",
+        };
+      }
     } else {
-      return {
-        isAuthenticated: true,
-      };
+      usersDb.push({ name: userName, password });
     }
+    return {
+      isAuthenticated: true,
+    };
   };
 }
 
